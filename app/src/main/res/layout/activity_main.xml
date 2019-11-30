@@ -4,15 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
+    android:background="@color/colorYellow"
     android:orientation="vertical"
     tools:context=".presentetion.MainActivity">
-
-    <ImageView
-        android:id="@+id/icon_weather"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:padding="@dimen/defaul_padding"
-        android:src="@mipmap/ic_launcher" />
 
 
     <TextView

@@ -8,5 +8,5 @@ import java.io.IOException;
 
 public interface IWeatherRepository {
     @NonNull
-    Weather loadProfileInfo() throws IOException;
+    Weather loadWeatherInfo() throws IOException;
 }

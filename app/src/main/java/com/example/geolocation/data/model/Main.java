@@ -7,17 +7,17 @@ public class Main {
 
     @SerializedName("temp")
     @Expose
-    public Double temp;
+    public String temp;
     @SerializedName("pressure")
     @Expose
-    public Integer pressure;
+    public String pressure;
     @SerializedName("humidity")
     @Expose
-    public Integer humidity;
+    public String humidity;
     @SerializedName("temp_min")
     @Expose
-    public Double tempMin;
+    public String tempMin;
     @SerializedName("temp_max")
     @Expose
-    public Double tempMax;
+    public String tempMax;
 }
