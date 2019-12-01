@@ -9,8 +9,8 @@ import retrofit2.http.Query;
 
 public interface JSONPlaceHolderApi {
     @GET("/data/2.5/weather")
-    Call<Example> getWeatherInfo(@Query("lat") String lat,
-                                 @Query("lon") String lon,
+    Call<Example> getWeatherInfo(@Query("lat") Double lat,
+                                 @Query("lon") Double lon,
                                  @Query("units") String celsius,
                               @Query("APPID") String key);
 }

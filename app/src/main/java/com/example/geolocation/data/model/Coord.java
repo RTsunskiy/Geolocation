@@ -7,8 +7,8 @@ public class Coord {
 
     @SerializedName("lon")
     @Expose
-    public Integer lon;
+    public Double lon;
     @SerializedName("lat")
     @Expose
-    public Integer lat;
+    public Double lat;
 }

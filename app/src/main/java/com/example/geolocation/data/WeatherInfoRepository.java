@@ -36,8 +36,8 @@ public class WeatherInfoRepository implements IWeatherRepository {
     @NonNull
     @Override
     public Weather loadWeatherInfo(Location location) throws IOException {
-        Response<Example> response = mWeatherApi.getWeatherInfo(String.valueOf(location.getLatitude()),
-                String.valueOf(location.getLongitude()), CELSIUS_PARAM, API_KEY).execute();
+        Response<Example> response = mWeatherApi.getWeatherInfo(location.getLatitude(),
+                location.getLongitude(), CELSIUS_PARAM, API_KEY).execute();
         if (response.body() == null || response.errorBody() != null) {
             throw new IOException("Не удалось загрузить информацию о погоде");
         }
