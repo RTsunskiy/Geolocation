@@ -3,4 +3,5 @@
     <string name="current_degrees">Текущая температура:</string>
     <string name="max_degrees_today">Максимальная температура на сегодня:</string>
     <string name="min_degrees_today">Минимальная температура на сегодня:</string>
+    <string name="eror_loading_weather">Ошибка при загрузке погоды</string>
 </resources>
