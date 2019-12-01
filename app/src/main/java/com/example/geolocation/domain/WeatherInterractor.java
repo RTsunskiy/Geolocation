@@ -1,9 +1,11 @@
 package com.example.geolocation.domain;
 
+import android.location.Location;
+
 import androidx.annotation.NonNull;
 
 import com.example.geolocation.domain.model.Weather;
-import com.example.geolocation.presentetion.MainActivity;
+
 
 import java.io.IOException;
 
@@ -15,9 +17,9 @@ public class WeatherInterractor {
     }
 
 
-    public Weather loadWeatherInfo(MainActivity activity) throws LoadWeatherException {
+    public Weather loadWeatherInfo(Location location) throws LoadWeatherException {
         try {
-            return mWeatherRepository.loadWeatherInfo(activity);
+            return mWeatherRepository.loadWeatherInfo(location);
         } catch (IOException e) {
             throw new LoadWeatherException("Не удалось загрузить информацию о погоде", e);
         }

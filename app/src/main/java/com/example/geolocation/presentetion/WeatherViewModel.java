@@ -1,6 +1,8 @@
 package com.example.geolocation.presentetion;
 
 
+import android.location.Location;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -32,12 +34,12 @@ public class WeatherViewModel extends ViewModel {
         mResourceWrapper = resourceWrapper;
     }
 
-    void loadWeather(MainActivity activity) {
+    void loadWeather(Location location) {
         mIsLoading.setValue(true);
         mExecutor.execute(() -> {
             try {
-                Weather profile = mWeatherInteractor.loadWeatherInfo(activity);
-                mWeather.postValue(profile);
+                Weather weather = mWeatherInteractor.loadWeatherInfo(location);
+                mWeather.postValue(weather);
             } catch (LoadWeatherException e) {
                 mErrors.postValue(mResourceWrapper.getString(R.string.eror_loading_weather));
             }

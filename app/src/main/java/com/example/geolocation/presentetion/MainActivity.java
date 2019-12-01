@@ -9,8 +9,12 @@ import androidx.lifecycle.ViewModelProviders;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -18,8 +22,15 @@ import android.widget.Toast;
 
 import com.example.geolocation.R;
 import com.example.geolocation.data.LocationService;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsStates;
-
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.Task;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -28,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CHECK_SETTINGS = 102;
     private LocationService mLocationService;
     private WeatherViewModel mViewModel;
-
     private TextView mLongtitude;
     private TextView mLatitude;
     private TextView mCurrentTemperature;
@@ -36,16 +46,18 @@ public class MainActivity extends AppCompatActivity {
     private TextView mMinTemperature;
     private View mLoadingView;
 
+    public void setmLocation(Location mLocation) {
+        this.mLocation = mLocation;
+    }
+
+    private Location mLocation;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
         mLocationService = new LocationService(this);
-        mLocationService.checkGooglePlayServices();
-        checkPermission();
         initView();
-        setupMvvm();
     }
 
 
@@ -53,7 +65,20 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        mLocationService.checkGooglePlayServices();
+        checkGooglePlayServices();
+    }
+
+
+    public void checkGooglePlayServices() {
+        GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
+        int statusCode = googleApiAvailability.isGooglePlayServicesAvailable(MyApplication.getAppContext());
+        if (statusCode != ConnectionResult.SUCCESS) {
+            Dialog errorDialog = googleApiAvailability.getErrorDialog(this, statusCode,
+                    0, dialogInterface -> finish());
+            errorDialog.show();
+        } else {
+            checkPermission();
+        }
     }
 
 
@@ -72,6 +97,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    public void checkDeviceSettings() {
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(mLocationService.getLocationRequest());
+        SettingsClient client = LocationServices.getSettingsClient(this);
+        Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
+        task.addOnSuccessListener(this, locationSettingsResponse -> mLocationService.startLocationService());
+        task.addOnFailureListener(this, e -> {
+            if (e instanceof ResolvableApiException) {
+                try {
+                    ResolvableApiException resolvable = (ResolvableApiException) e;
+                    resolvable.startResolutionForResult(MainActivity.this,
+                            REQUEST_CHECK_SETTINGS);
+                } catch (IntentSender.SendIntentException sendEx) {
+                    // Ignore the error.
+                }
+            }
+        });
+
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -94,9 +138,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
-
     public void checkPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
@@ -106,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         else {
-            mLocationService.checkDeviceSettings();
+            checkDeviceSettings();
         }
     }
 
@@ -116,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
                 REQUEST_CODE);
     }
 
-    private void setupMvvm() {
+    public void setupMvvm() {
         mViewModel = ViewModelProviders.of(this, new WeatherViewModelFactory(this))
                 .get(WeatherViewModel.class);
         mViewModel.getErrors().observe(this, error ->
@@ -128,8 +169,7 @@ public class MainActivity extends AppCompatActivity {
             mMaxTemperature.setText(weather.getmMaxTemperature());
             mMinTemperature.setText(weather.getmMinTemperature());
         });
-        mViewModel.isLoading().observe(this, isLoading -> mLoadingView.setVisibility(isLoading ? View.VISIBLE : View.GONE));
-        mViewModel.loadWeather(this);
+        mViewModel.loadWeather(mLocation);
     }
 
     private void initView() {

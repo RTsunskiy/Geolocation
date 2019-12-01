@@ -1,8 +1,6 @@
 package com.example.geolocation.data;
 
 
-import android.app.Application;
-import android.location.Address;
 import android.location.Location;
 
 import androidx.annotation.NonNull;
@@ -10,8 +8,6 @@ import androidx.annotation.NonNull;
 import com.example.geolocation.data.model.Example;
 import com.example.geolocation.domain.IWeatherRepository;
 import com.example.geolocation.domain.model.Weather;
-import com.example.geolocation.presentetion.MainActivity;
-import com.example.geolocation.presentetion.MyApplication;
 
 import java.io.IOException;
 
@@ -21,12 +17,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class WeatherInfoRepository implements IWeatherRepository {
 
-    private static final String BASE_URL = "https://samples.openweathermap.org/data/2.5/";
+    private static final String BASE_URL = "http://api.openweathermap.org/";
     private final String API_KEY = "e6e474cad3b43e69d80ee2d3c4294b4c";
-    private final String CELSIUS_PARAM = "units=metric";
+    private final String CELSIUS_PARAM = "metric";
     private Retrofit mRetrofit;
     private final JSONPlaceHolderApi mWeatherApi;
-    private LocationService mLocationService;
 
 
     public WeatherInfoRepository() {
@@ -40,10 +35,7 @@ public class WeatherInfoRepository implements IWeatherRepository {
 
     @NonNull
     @Override
-    public Weather loadWeatherInfo(MainActivity activity) throws IOException {
-        mLocationService = new LocationService(activity);
-        mLocationService.startLocationService();
-        Location location = mLocationService.getmLocation();
+    public Weather loadWeatherInfo(Location location) throws IOException {
         Response<Example> response = mWeatherApi.getWeatherInfo(String.valueOf(location.getLatitude()),
                 String.valueOf(location.getLongitude()), CELSIUS_PARAM, API_KEY).execute();
         if (response.body() == null || response.errorBody() != null) {
