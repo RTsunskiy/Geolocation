@@ -3,11 +3,9 @@ package com.example.geolocation.data;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.IntentSender;
-import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.os.AsyncTask;
-import android.util.Log;
+import android.os.Looper;
 
 
 import androidx.annotation.NonNull;
@@ -29,10 +27,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Locale;
 
 public class LocationService {
 
@@ -41,14 +37,16 @@ public class LocationService {
     private static final int REQUEST_CHECK_SETTINGS = 102;
     private Geocoder mGeocoder;
     private LocationCallback mLocationCallback = new MainLocationCallback();
-    public static Address mAdrdess;
+    public static Location mLocation;
 
-    public Address getmAdress() {
-        return mAdrdess;
+
+    public Location getmLocation() {
+        return mLocation;
     }
 
     public LocationService(MainActivity activity) {
         this.mMainActivityWeakReference = new WeakReference<>(activity);
+        mGeocoder = new Geocoder(mMainActivityWeakReference.get(), Locale.getDefault());
     }
 
 
@@ -65,7 +63,7 @@ public class LocationService {
                     });
             errorDialog.show();
         } else {
-
+            mMainActivityWeakReference.get().checkPermission();
         }
     }
 
@@ -98,7 +96,6 @@ public class LocationService {
 
     public void startLocationService() {
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(mMainActivityWeakReference.get());
-
         mFusedLocationProviderClient.requestLocationUpdates(getLocationRequest(), mLocationCallback, null);
     }
 
@@ -110,39 +107,6 @@ public class LocationService {
         return locationRequest;
     }
 
-    private static class GeocodingAsyncTask extends AsyncTask<Location, Void, List<Address>> {
-
-        private final Geocoder mGeocoder;
-
-        private GeocodingAsyncTask(Geocoder geocoder) {
-            mGeocoder = geocoder;
-        }
-
-        @Override
-        protected List<Address> doInBackground(Location... locations) {
-            Location location = locations[0];
-
-            try {
-                List<Address> addressList = mGeocoder.getFromLocation(location.getLatitude(),
-                        location.getLongitude(), 1);
-
-                return addressList;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return new ArrayList<>();
-        }
-
-        @Override
-        protected void onPostExecute(List<Address> addressList) {
-            super.onPostExecute(addressList);
-
-            for (Address address : addressList) {
-                mAdrdess = address;
-            }
-        }
-    }
 
     private class MainLocationCallback extends LocationCallback {
         @Override
@@ -153,8 +117,7 @@ public class LocationService {
             }
 
             for (Location location : locationResult.getLocations()) {
-                GeocodingAsyncTask geocodingAsyncTask = new GeocodingAsyncTask(mGeocoder);
-                geocodingAsyncTask.execute(location);
+                mLocation = location;
             }
         }
     }

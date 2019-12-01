@@ -3,6 +3,7 @@ package com.example.geolocation.data;
 
 import android.app.Application;
 import android.location.Address;
+import android.location.Location;
 
 import androidx.annotation.NonNull;
 
@@ -42,15 +43,15 @@ public class WeatherInfoRepository implements IWeatherRepository {
     public Weather loadWeatherInfo(MainActivity activity) throws IOException {
         mLocationService = new LocationService(activity);
         mLocationService.startLocationService();
-        Address address = mLocationService.getmAdress();
-        Response<Example> response = mWeatherApi.getWeatherInfo(String.valueOf(address.getLatitude()),
-                String.valueOf(address.getLongitude()), CELSIUS_PARAM, API_KEY).execute();
+        Location location = mLocationService.getmLocation();
+        Response<Example> response = mWeatherApi.getWeatherInfo(String.valueOf(location.getLatitude()),
+                String.valueOf(location.getLongitude()), CELSIUS_PARAM, API_KEY).execute();
         if (response.body() == null || response.errorBody() != null) {
             throw new IOException("Не удалось загрузить информацию о погоде");
         }
         Example weatherObjectInfo = response.body();
-        return new Weather(String.valueOf(address.getLatitude()),
-                           String.valueOf(address.getLongitude()),
+        return new Weather(String.valueOf(location.getLatitude()),
+                           String.valueOf(location.getLongitude()),
                            weatherObjectInfo.main.temp,
                             weatherObjectInfo.main.tempMax,
                             weatherObjectInfo.main.tempMin);
