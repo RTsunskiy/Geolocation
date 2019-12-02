@@ -42,11 +42,12 @@ public class WeatherInfoRepository implements IWeatherRepository {
             throw new IOException("Не удалось загрузить информацию о погоде");
         }
         Example weatherObjectInfo = response.body();
-        return new Weather(String.valueOf(location.getLatitude()),
-                           String.valueOf(location.getLongitude()),
-                           weatherObjectInfo.main.temp,
-                            weatherObjectInfo.main.tempMax,
-                            weatherObjectInfo.main.tempMin);
+        Weather weather = new Weather(String.valueOf(location.getLatitude()),
+                String.valueOf(location.getLongitude()),
+                weatherObjectInfo.main.temp,
+                weatherObjectInfo.main.tempMax,
+                weatherObjectInfo.main.tempMin);
+        return weather;
     }
 
     }

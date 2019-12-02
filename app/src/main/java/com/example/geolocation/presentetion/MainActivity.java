@@ -45,18 +45,22 @@ public class MainActivity extends AppCompatActivity {
     private TextView mMaxTemperature;
     private TextView mMinTemperature;
     private View mLoadingView;
+    private Location mLocation;
+
 
     public void setmLocation(Location mLocation) {
         this.mLocation = mLocation;
+        setupMvvm();
     }
 
-    private Location mLocation;
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mLocationService = new LocationService(this);
+        setContentView(R.layout.activity_main);
         initView();
     }
 
@@ -89,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
             if (grantResults.length > 1) {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                     mLocationService.startLocationService();
-
                 } else {
                     finish();
                 }

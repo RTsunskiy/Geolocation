@@ -37,8 +37,6 @@ public class LocationService {
 
     public LocationRequest getLocationRequest() {
         LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setInterval(1000L);
-        locationRequest.setFastestInterval(5000L);
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         return locationRequest;
     }
@@ -55,7 +53,6 @@ public class LocationService {
             for (Location location : locationResult.getLocations()) {
                 mLocation = location;
                 mMainActivityWeakReference.get().setmLocation(location);
-                mMainActivityWeakReference.get().setupMvvm();
             }
         }
     }
